@@ -1,0 +1,53 @@
+plugins {
+    kotlin("jvm")
+    `maven-publish`
+    `java-library`
+}
+
+group = "com.github.tanokun.reactivesk"
+version = "1.0.0"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(project(":compiler-frontend"))
+    implementation(project(":lang"))
+    implementation(libs.bytebuddy)
+
+    testImplementation(kotlin("test"))
+    testImplementation(libs.mockk)
+}
+
+kotlin {
+    jvmToolchain(8)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+tasks.register<Jar>("sourcesJar") {
+    archiveClassifier.set("sources")
+    from(sourceSets["main"].allSource)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+            artifact(tasks["sourcesJar"])
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/tanoKun/ReactiveSk-Common")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN") // or use PAT in secrets
+            }
+        }
+    }
+}
