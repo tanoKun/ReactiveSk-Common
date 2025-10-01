@@ -40,15 +40,14 @@ kotlin {
 
 val sourcesJar by tasks.registering(Jar::class) {
     archiveClassifier.set("sources")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(sourceSets["main"].allSource)
 
     val genDir = layout.buildDirectory.dir("generated-src/antlr/main")
-    // 生成タスクへの明示的依存
     dependsOn(tasks.named("generateGrammarSource"))
     from(genDir) {
         include("**/*")
     }
-    // 生成ディレクトリを入力として宣言
     inputs.dir(genDir)
 }
 
