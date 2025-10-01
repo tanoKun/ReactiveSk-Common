@@ -43,6 +43,15 @@ tasks.register<Jar>("sourcesJar") {
     from(sourceSets["main"].allSource)
 }
 
+tasks.named("sourcesJar", Jar::class) {
+    val genDir = layout.buildDirectory.dir("generated-src/antlr/main")
+    dependsOn("generateGrammarSource")
+    from(genDir) {
+        include("**/*")
+    }
+    inputs.dir(genDir)
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
