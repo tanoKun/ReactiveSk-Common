@@ -2,10 +2,17 @@ plugins {
     kotlin("jvm") version libs.versions.kotlin
 }
 
+
+repositories {
+    mavenCentral()
+}
+
 kotlin {
     jvmToolchain(8)
 }
 
-repositories {
-    mavenCentral()
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
 }

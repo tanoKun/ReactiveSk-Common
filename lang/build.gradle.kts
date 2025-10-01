@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     kotlin("jvm")
     `maven-publish`
@@ -15,9 +18,22 @@ kotlin {
     jvmToolchain(8)
 }
 
-tasks.register<Jar>("sourcesJar") {
-    archiveClassifier.set("sources")
-    from(sourceSets["main"].allSource)
+java {
+    withSourcesJar()
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_1_8)
+    }
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
 }
 
 publishing {
@@ -33,8 +49,12 @@ publishing {
             url = uri("https://maven.pkg.github.com/tanoKun/ReactiveSk-Common")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN") // or use PAT in secrets
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
