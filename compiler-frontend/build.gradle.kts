@@ -42,6 +42,7 @@ kotlin {
 }
 
 java {
+    withSourcesJar()
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(8))
     }
@@ -58,16 +59,17 @@ tasks.withType<JavaCompile>().configureEach {
     targetCompatibility = "1.8"
 }
 
-val sourcesJar by tasks.registering(Jar::class) {
-    archiveClassifier.set("sources")
+val genDir = layout.buildDirectory.dir("generated-src/antlr/main")
+
+tasks.named<Jar>("sourcesJar") {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(sourceSets["main"].allSource)
 
-    val genDir = layout.buildDirectory.dir("generated-src/antlr/main")
     dependsOn(tasks.named("generateGrammarSource"))
     from(genDir) {
         include("**/*")
     }
+
     inputs.dir(genDir)
 }
 
