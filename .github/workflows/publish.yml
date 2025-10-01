@@ -29,4 +29,4 @@ jobs:
       - name: Publish artifacts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew :lang:publish :compiler-backend:publish :compiler-frontend:publish :adapter-common:publish --no-daemon
+        run: ./gradlew :lang:publish :compiler-backend:publish :compiler-frontend:publish :adapter-common:publish --no-daemon --warning-mode=all --stacktrace

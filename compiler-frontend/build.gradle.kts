@@ -38,17 +38,17 @@ kotlin {
     jvmToolchain(8)
 }
 
-tasks.register<Jar>("sourcesJar") {
+val sourcesJar by tasks.registering(Jar::class) {
     archiveClassifier.set("sources")
     from(sourceSets["main"].allSource)
-}
 
-tasks.named("sourcesJar", Jar::class) {
     val genDir = layout.buildDirectory.dir("generated-src/antlr/main")
-    dependsOn("generateGrammarSource")
+    // 生成タスクへの明示的依存
+    dependsOn(tasks.named("generateGrammarSource"))
     from(genDir) {
         include("**/*")
     }
+    // 生成ディレクトリを入力として宣言
     inputs.dir(genDir)
 }
 
@@ -56,7 +56,7 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
-            artifact(tasks["sourcesJar"])
+            artifact(sourcesJar.get())
         }
     }
     repositories {
