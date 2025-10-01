@@ -28,12 +28,15 @@ kotlin {
 }
 
 java {
-    withSourcesJar()
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(8))
     }
 }
 
+tasks.register<Jar>("sourcesJar") {
+    archiveClassifier.set("sources")
+    from(sourceSets["main"].allSource)
+}
 
 tasks.withType<KotlinCompile>().configureEach {
     compilerOptions {

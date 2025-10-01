@@ -42,7 +42,6 @@ kotlin {
 }
 
 java {
-    withSourcesJar()
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(8))
     }
@@ -59,17 +58,16 @@ tasks.withType<JavaCompile>().configureEach {
     targetCompatibility = "1.8"
 }
 
-val genDir = layout.buildDirectory.dir("generated-src/antlr/main")
-
-tasks.named<Jar>("sourcesJar") {
+val sourcesJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(sourceSets["main"].allSource)
 
+    val genDir = layout.buildDirectory.dir("generated-src/antlr/main")
     dependsOn(tasks.named("generateGrammarSource"))
     from(genDir) {
         include("**/*")
     }
-
     inputs.dir(genDir)
 }
 
@@ -77,7 +75,7 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
-            artifact(tasks["sourcesJar"])
+            artifact(sourcesJar.get())
         }
     }
     repositories {
@@ -86,7 +84,7 @@ publishing {
             url = uri("https://maven.pkg.github.com/tanoKun/ReactiveSk-Common")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                password = System.getenv("GITHUB_TOKEN") // or use PAT in secrets
             }
         }
     }
