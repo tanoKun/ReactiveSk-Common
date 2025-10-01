@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version libs.versions.kotlin
+    kotlin("jvm")
     `maven-publish`
     `java-library`
 }
@@ -11,8 +11,8 @@ repositories {
     mavenCentral()
 }
 
-tasks.test {
-    useJUnitPlatform()
+kotlin {
+    jvmToolchain(8)
 }
 
 tasks.register<Jar>("sourcesJar") {
