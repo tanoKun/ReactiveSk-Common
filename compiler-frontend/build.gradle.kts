@@ -42,6 +42,7 @@ kotlin {
 }
 
 java {
+    withSourcesJar()
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(8))
     }
@@ -58,7 +59,7 @@ tasks.withType<JavaCompile>().configureEach {
     targetCompatibility = "1.8"
 }
 
-val sourcesJar by tasks.registering(Jar::class) {
+tasks.named<Jar>("sourcesJar") {
     archiveClassifier.set("sources")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(sourceSets["main"].allSource)
@@ -68,6 +69,7 @@ val sourcesJar by tasks.registering(Jar::class) {
     from(genDir) {
         include("**/*")
     }
+
     inputs.dir(genDir)
 }
 
@@ -75,7 +77,6 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
-            artifact(sourcesJar.get())
         }
     }
     repositories {
