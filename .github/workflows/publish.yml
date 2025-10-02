@@ -26,7 +26,34 @@ jobs:
           java-version: 11
           cache: gradle
 
-      - name: Publish artifacts
+      - name: Detect changed modules
+        id: changed
+        run: |
+          # ensure full history for diff
+          git fetch --no-tags --prune --unshallow || true
+          CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} || true)
+          # list of modules to consider
+          echo "Raw changed files:"
+          echo "$CHANGED"
+          MODULES=$(echo "$CHANGED" | grep -E '^(lang|compiler-backend|compiler-frontend|adapter-common)/' || true)
+          MODULES=$(echo "$MODULES" | sed -E 's#/.*##' | sort -u | xargs || true)
+          echo "Detected modules: $MODULES"
+          echo "modules=$MODULES" >> $GITHUB_OUTPUT
+
+      - name: Publish artifacts for changed modules
+        if: steps.changed.outputs.modules != ''
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew :lang:publish :compiler-backend:publish :compiler-frontend:publish :adapter-common:publish --no-daemon --warning-mode=all --stacktrace
+        run: |
+          MODULES="${{ steps.changed.outputs.modules }}"
+          echo "Publishing modules: $MODULES"
+          ARGS=""
+          for m in $MODULES; do
+            ARGS="$ARGS :$m:publish"
+          done
+          # run gradle with the dynamically built list
+          ./gradlew $ARGS --no-daemon --warning-mode=all --stacktrace
+
+      - name: Skip publish (no changes)
+        if: steps.changed.outputs.modules == ''
+        run: echo "No publishable module changes detected, skipping."
