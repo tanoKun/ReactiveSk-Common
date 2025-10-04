@@ -86,7 +86,6 @@ abstract class AbstractDataFlowAnalyzer<T: Any, H: Any>(private val rootAst: Ast
             is AstNode.Line -> analyzeLine(node, currentState)
             is AstNode.Struct -> analyzeBlock(node, currentState)
             is AstNode.Section -> analyzeSection(node, currentState)
-            is AstNode.Struct -> throw IllegalArgumentException("Root node should be handled at the top level.")
         }
     }
 
