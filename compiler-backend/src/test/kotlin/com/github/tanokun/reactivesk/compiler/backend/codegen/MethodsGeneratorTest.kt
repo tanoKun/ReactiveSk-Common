@@ -37,7 +37,7 @@ class MethodsGeneratorTest {
         val classDefinition = mockk<ClassDefinition>()
         every { classDefinition.functions } returns listOf(func)
 
-        val generator = MethodsGenerator(
+        val generator = MethodsGenerator<Any>(
             classResolver,
             variableFramesIntrinsics = TestHelpers::class.java,
             triggerItemIntrinsics = TestHelpers2::class.java,

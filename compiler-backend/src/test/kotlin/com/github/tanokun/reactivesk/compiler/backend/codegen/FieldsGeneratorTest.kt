@@ -26,7 +26,7 @@ class FieldsGeneratorTest {
         every { resolveTypeDescription(Identifier("String"), true) } returns TypeDescription.ForLoadedType.of(ArrayList::class.java)
     }
 
-    val generator = FieldsGenerator(classResolver, TestHelpers::class.java)
+    val generator = FieldsGenerator<Any>(classResolver, TestHelpers::class.java)
 
     @Test
     @DisplayName("フィールドとセッターが生成される")

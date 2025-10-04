@@ -45,7 +45,7 @@ class ConstructorGeneratorTest {
             every { constructor } returns constructorHolder
         }
 
-        val generator = ConstructorGenerator(
+        val generator = ConstructorGenerator<Any>(
             classResolver,
             TestHelpers::class.java,
             TestHelpers2::class.java,
