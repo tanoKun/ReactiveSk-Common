@@ -16,6 +16,15 @@ import net.bytebuddy.implementation.bytecode.member.MethodVariableAccess
 import net.bytebuddy.jar.asm.MethodVisitor
 import net.bytebuddy.matcher.ElementMatchers
 
+/**
+ * フィールドセッターのバイトコードを生成するアペンダークラスです。
+ * 指定されたフィールドへ値を設定し、必要に応じて変更通知を行うバイトコードを出力します。
+ *
+ * @param fieldName 生成対象の内部フィールド名
+ * @param propertyNameLiteral プロパティ名のリテラル
+ * @param isFactor プロパティがファクターかどうかを示すフラグ
+ * @param intrinsicsObjectClass 変更通知等の処理を提供するイントリンシックのクラス
+ */
 class ValueSetterAppender(
     private val fieldName: String,
     private val propertyNameLiteral: String,
@@ -32,6 +41,15 @@ class ValueSetterAppender(
         intrinsicsObjectClass.getNotifyChangedMethod()
     )
 
+    /**
+     * メソッドに対してバイトコードを出力します。
+     *
+     * @param methodVisitor ASM の `MethodVisitor`
+     * @param implementationContext ByteBuddy の `Implementation.Context`
+     * @param instrumentedMethod 生成対象のメソッド記述
+     *
+     * @return 生成したスタック要件を表す `ByteCodeAppender.Size`
+     */
     override fun apply(
         methodVisitor: MethodVisitor,
         implementationContext: Implementation.Context,
@@ -60,7 +78,13 @@ class ValueSetterAppender(
         return ByteCodeAppender.Size(applied.maximalSize, instrumentedMethod.stackSize + 1)
     }
 
-    // String old = this.field
+    /**
+     * 現在のフィールド値を一時変数へ退避するためのスタック操作を生成します。
+     *
+     * @param fieldDescription 対象フィールドの記述
+     *
+     * @return 退避操作の配列
+     */
     private fun createEvacuationValueStack(fieldDescription: FieldDescription): Array<StackManipulation> =
         arrayOf(
             MethodVariableAccess.loadThis(),
@@ -68,7 +92,11 @@ class ValueSetterAppender(
             MethodVariableAccess.REFERENCE.storeAt(3)
         )
 
-    // JvmSetterIntrinsics.INSTANCE.notifyChanged(var2, this, "field2", old, var1)
+    /**
+     * 変更通知を呼び出すためのスタック操作を生成します。
+     *
+     * @return 変更通知呼び出しに必要なスタック操作の配列
+     */
     private fun createNotifyChangedStack(): Array<StackManipulation> =
         arrayOf(
             FieldAccess.forField(instanceFieldDescription).read(),   // push INSTANCE (レシーバ)

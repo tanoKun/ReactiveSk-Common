@@ -1,5 +1,10 @@
 package com.github.tanokun.reactivesk.compiler.backend.intrinsics
 
+/**
+ * オブジェクトのフィールドセッターに関する基本的な操作を提供するインターフェースです。
+ * このインターフェースは、プロパティ変更通知やリスト内の型検証を行うためのメソッドを含みます。
+ * 実装は `INSTANCE` フィールドをシングルトンとして持つ必要があります。
+ */
 interface JvmSetterIntrinsics {
     /**
      * プロパティの値が変更されたことを通知します。
