@@ -49,7 +49,6 @@ class ConstructorGeneratorTest {
             classResolver,
             TestHelpers::class.java,
             TestHelpers2::class.java,
-            isImplementingBeginFrame = true
         )
 
         val builder = ByteBuddy()
@@ -74,10 +73,6 @@ class ConstructorGeneratorTest {
     }
 
     object TestHelpers: VariableFramesIntrinsics {
-        override fun beginFrame(mediator: Any, capacity: Int) {
-
-        }
-
         override fun set(mediator: Any, index: Int, value: Any?) {
 
         }

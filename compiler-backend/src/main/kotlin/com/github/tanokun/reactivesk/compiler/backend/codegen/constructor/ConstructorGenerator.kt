@@ -17,7 +17,6 @@ class ConstructorGenerator<T>(
     private val classResolver: ClassResolver,
     private val variableFramesIntrinsics: Class<out VariableFramesIntrinsics>,
     private val triggerItemIntrinsics: Class<out TriggerItemIntrinsics>,
-    private val isImplementingBeginFrame: Boolean,
 ) {
     private val mediatorType = TypeDescription.ForLoadedType(Any::class.java)
 
@@ -54,14 +53,7 @@ class ConstructorGenerator<T>(
     }
 
     private fun createConstructorProxyImplementation(parameters: List<ClassDefinition.Constructor.Parameter>): Implementation.Composable {
-        val initialImpl: Implementation.Composable =
-            if (isImplementingBeginFrame)
-                MethodCall.invoke(variableFramesIntrinsics.getBeginFrameMethod())
-                    .onField(variableFramesIntrinsics.VARIABLE_FRAMES_INSTANCE_FIELD)
-                    .withArgument(0)
-                    .with(parameters.size + 1)
-                    .andThen(createSetTypedVariableImplementation(0) { it.withThis() })
-             else createSetTypedVariableImplementation(0) { it.withThis() }
+        val initialImpl: Implementation.Composable = createSetTypedVariableImplementation(0) { it.withThis() }
 
         val setParamsImpl = parameters.foldIndexed(initialImpl) { index, acc, _ ->
             acc.andThen(createSetTypedVariableImplementation(index + 1) { it.withArgument(index + 1) })

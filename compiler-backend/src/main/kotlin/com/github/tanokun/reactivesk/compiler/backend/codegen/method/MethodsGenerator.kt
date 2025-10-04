@@ -21,13 +21,11 @@ import java.lang.reflect.Modifier
  * @param classResolver 型解決を行う `ClassResolver`
  * @param variableFramesIntrinsics 変数フレーム操作を提供するイントリンシックのクラス
  * @param triggerItemIntrinsics トリガー実行を提供するイントリンシックのクラス
- * @param isImplementingBeginFrame `beginFrame` を実装するかどうかのフラグ
  */
 class MethodsGenerator<T>(
     private val classResolver: ClassResolver,
     private val variableFramesIntrinsics: Class<out VariableFramesIntrinsics>,
     private val triggerItemIntrinsics: Class<out TriggerItemIntrinsics>,
-    private val isImplementingBeginFrame: Boolean,
 ) {
     private val mediatorType = TypeDescription.ForLoadedType(Any::class.java)
 
@@ -78,15 +76,7 @@ class MethodsGenerator<T>(
     }
 
     private fun createMethodImplementation(func: ClassDefinition.Function): Implementation {
-        val initialImpl: Implementation.Composable = if (isImplementingBeginFrame) {
-            MethodCall.invoke(variableFramesIntrinsics.getBeginFrameMethod())
-                .onField(variableFramesIntrinsics.VARIABLE_FRAMES_INSTANCE_FIELD)
-                .withArgument(0)
-                .with(func.parameters.size + 1)
-                .andThen(createSetTypedVariableImplementation(0) { it.withThis() })
-        } else {
-            createSetTypedVariableImplementation(0) { it.withThis() }
-        }
+        val initialImpl: Implementation.Composable = createSetTypedVariableImplementation(0) { it.withThis() }
 
         val setArgsImpl = func.parameters.foldIndexed(initialImpl) { index, acc, _ ->
             val impl = createSetTypedVariableImplementation(index + 1) { it.withArgument(index + 1) }

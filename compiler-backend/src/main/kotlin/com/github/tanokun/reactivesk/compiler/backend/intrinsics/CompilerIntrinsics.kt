@@ -23,14 +23,6 @@ fun Class<out TriggerItemIntrinsics>.getWalkMethod(): Method =
     this.getMethod("walk", Any::class.java, Any::class.java)
 
 /**
- * `VariableFramesIntrinsics` の `beginFrame` メソッドを返します。
- *
- * @return `Method` 型の `beginFrame` メソッド
- */
-fun Class<out VariableFramesIntrinsics>.getBeginFrameMethod(): Method =
-    this.getMethod("beginFrame", Any::class.java, Int::class.java)
-
-/**
  * `VariableFramesIntrinsics` の `set` メソッドを返します。
  *
  * @return `Method` 型の `set` メソッド

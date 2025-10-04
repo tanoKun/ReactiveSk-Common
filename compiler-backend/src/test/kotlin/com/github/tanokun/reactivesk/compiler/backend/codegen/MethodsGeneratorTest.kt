@@ -41,7 +41,6 @@ class MethodsGeneratorTest {
             classResolver,
             variableFramesIntrinsics = TestHelpers::class.java,
             triggerItemIntrinsics = TestHelpers2::class.java,
-            isImplementingBeginFrame = true
         )
 
         val builder = ByteBuddy(ClassFileVersion.JAVA_V8)
@@ -65,10 +64,6 @@ class MethodsGeneratorTest {
     }
 
     object TestHelpers: VariableFramesIntrinsics {
-        override fun beginFrame(mediator: Any, capacity: Int) {
-
-        }
-
         override fun set(mediator: Any, index: Int, value: Any?) {
 
         }
