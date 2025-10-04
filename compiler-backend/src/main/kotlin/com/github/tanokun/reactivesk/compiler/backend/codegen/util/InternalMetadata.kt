@@ -16,7 +16,7 @@ const val CONSTRUCTOR_PROXY: String = INTERNAL_PREFIX + $$"proxy$ctor"
 const val FUNCTION_TRIGGER_PREFIX: String = INTERNAL_PREFIX + $$"trigger$fun$"
 private const val FUNCTION_NAME_PREFIX: String = INTERNAL_PREFIX + "fun$"
 /** 関数トリガー用の内部フィールド名を生成 */
-fun internalFunctionTriggerField(funcName: String): String = "$FUNCTION_TRIGGER_PREFIX$funcName"
+fun internalFunctionTriggerField(funcName: String, index: Int): String = "$FUNCTION_TRIGGER_PREFIX$funcName$$index"
 
 fun internalFunctionNameOf(funcName: String): String = "$FUNCTION_NAME_PREFIX$funcName"
 

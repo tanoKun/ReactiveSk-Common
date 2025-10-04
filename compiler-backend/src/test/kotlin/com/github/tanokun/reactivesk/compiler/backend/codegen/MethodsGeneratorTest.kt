@@ -17,6 +17,7 @@ import net.bytebuddy.dynamic.loading.ClassLoadingStrategy
 import net.bytebuddy.dynamic.scaffold.TypeValidation
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.io.File
+import kotlin.jvm.java
 import kotlin.test.Test
 
 class MethodsGeneratorTest {
@@ -24,18 +25,32 @@ class MethodsGeneratorTest {
     fun `defineAllMethods actually generates method and trigger field`() {
         val classResolver = mockk<ClassResolver> {
             every { resolveTypeDescription(Identifier("String")) } returns TypeDescription.ForLoadedType.of(String::class.java)
+            every { resolveTypeDescription(Identifier("Int")) } returns TypeDescription.ForLoadedType.of(Int::class.java)
             every { resolveTypeDescription(Identifier("String"), false) } returns TypeDescription.ForLoadedType.of(String::class.java)
         }
 
-        val func = mockk<ClassDefinition.Function>()
-        every { func.functionName } returns Identifier("doSomething")
-        every { func.modifiers } returns 0
-        every { func.returns } returns ClassDefinition.Function.Returns(Identifier("String"), false)
-        every { func.parameters } returns emptyList()
-        every { func.throws } returns emptyList()
+        val func = mockk<ClassDefinition.Function> {
+            every { functionName } returns Identifier("doSomething")
+            every { modifiers } returns 0
+            every { returns } returns ClassDefinition.Function.Returns(Identifier("String"), false)
+            every { parameters } returns listOf(
+                ClassDefinition.Function.Parameter(Identifier("param1"), Identifier("String"), false)
+            )
+            every { throws } returns emptyList()
+        }
+
+        val func2 = mockk<ClassDefinition.Function> {
+            every { functionName } returns Identifier("doSomething")
+            every { modifiers } returns 0
+            every { returns } returns ClassDefinition.Function.Returns(Identifier("String"), false)
+            every { parameters } returns listOf(
+                ClassDefinition.Function.Parameter(Identifier("param1"), Identifier("Int"), false)
+            )
+            every { throws } returns emptyList()
+        }
 
         val classDefinition = mockk<ClassDefinition>()
-        every { classDefinition.functions } returns listOf(func)
+        every { classDefinition.functions } returns listOf(func, func2)
 
         val generator = MethodsGenerator<Any>(
             classResolver,
@@ -57,10 +72,12 @@ class MethodsGeneratorTest {
             .loaded
 
         val methodName = internalFunctionNameOf("doSomething")
-        val fieldName = internalFunctionTriggerField("doSomething")
+        val fieldName0 = internalFunctionTriggerField("doSomething", 0)
+        val fieldName1 = internalFunctionTriggerField("doSomething", 1)
 
         assertTrue(loaded.declaredMethods.any { it.name == methodName })
-        assertTrue(loaded.declaredFields.any { it.name == fieldName })
+        assertTrue(loaded.declaredFields.any { it.name == fieldName0 })
+        assertTrue(loaded.declaredFields.any { it.name == fieldName1 })
     }
 
     object TestHelpers: VariableFramesIntrinsics {

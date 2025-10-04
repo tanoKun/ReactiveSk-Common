@@ -45,7 +45,7 @@ class MethodsGenerator<T>(
     ): DynamicType.Builder<out T> {
         var current = builder
 
-        classDefinition.functions.forEach { func ->
+        classDefinition.functions.forEachIndexed { index, func ->
             val returns = func.returns
             val returnTypeDesc = classResolver.resolveTypeDescription(returns.typeName)
             val functionName = func.functionName.identifier
@@ -57,25 +57,32 @@ class MethodsGenerator<T>(
                     .toTypedArray()
             )
 
-            val processingImpl = createMethodImplementation(func)
+            val processingImpl = createMethodImplementation(func, index)
 
             val modifierMetadataAnnotation = AnnotationDescription.Builder
                 .ofType(ModifierMetadata::class.java)
                 .define("modifiers", func.modifiers)
                 .build()
 
+            val internalFunctionTriggerField = internalFunctionTriggerField(functionName, index)
+
+            val triggerMetaAnnotation = AnnotationDescription.Builder
+                .ofType(TriggerMetadata::class.java)
+                .define("triggerField", internalFunctionTriggerField)
+                .build()
+
             current = current
                 .defineMethod(internalFunctionNameOf(functionName), returnTypeDesc, Modifier.PUBLIC)
                 .withParameters(*parameterTypes)
                 .intercept(processingImpl)
-                .annotateMethod(modifierMetadataAnnotation)
-                .defineField(internalFunctionTriggerField(functionName), triggerType, Modifier.PUBLIC or Modifier.STATIC)
+                .annotateMethod(modifierMetadataAnnotation, triggerMetaAnnotation)
+                .defineField(internalFunctionTriggerField, triggerType, Modifier.PUBLIC or Modifier.STATIC)
         }
 
         return current
     }
 
-    private fun createMethodImplementation(func: ClassDefinition.Function): Implementation {
+    private fun createMethodImplementation(func: ClassDefinition.Function, index: Int): Implementation {
         val initialImpl: Implementation.Composable = createSetTypedVariableImplementation(0) { it.withThis() }
 
         val setArgsImpl = func.parameters.foldIndexed(initialImpl) { index, acc, _ ->
@@ -86,7 +93,7 @@ class MethodsGenerator<T>(
         val walkImpl = setArgsImpl.andThen(
             MethodCall.invoke(triggerItemIntrinsics.getWalkMethod())
                 .onField(triggerItemIntrinsics.TRIGGER_ITEM_INSTANCE_FIELD)
-                .withField(internalFunctionTriggerField(func.functionName.identifier))
+                .withField(internalFunctionTriggerField(func.functionName.identifier, index))
                 .withArgument(0)
         )
 
