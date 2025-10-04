@@ -11,7 +11,7 @@ import java.lang.reflect.Modifier
  * 動的に読み込まれたクラスと静的なクラス解決ロジックを組み合わせて型記述を返します。
  *
  * @param T 解決対象となるクラスの型パラメータ
- * @param moduleManager 動的クラスを管理する [DynamicClassManager]
+ * @param getLoadedClass 動的に読み込まれたクラスを取得する関数
  * @param staticClassResolver 静的なクラス解決を行う関数
  */
 class ModuleClassResolver<T>(
