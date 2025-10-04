@@ -42,9 +42,9 @@ class MethodsGenerator<T>(
      * @return メソッドが追加された `DynamicType.Builder<T>`
      */
     fun defineAllMethods(
-        builder: DynamicType.Builder<T>,
+        builder: DynamicType.Builder<out T>,
         classDefinition: ClassDefinition,
-    ): DynamicType.Builder<T> {
+    ): DynamicType.Builder<out T> {
         var current = builder
 
         classDefinition.functions.forEach { func ->

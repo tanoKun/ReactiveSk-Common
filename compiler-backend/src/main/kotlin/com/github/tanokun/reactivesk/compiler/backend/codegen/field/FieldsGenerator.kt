@@ -29,9 +29,9 @@ class FieldsGenerator<T>(
     private val jvmSetterIntrinsics: Class<out JvmSetterIntrinsics>,
 ) {
     fun defineFields(
-        builder: DynamicType.Builder<T>,
+        builder: DynamicType.Builder<out T>,
         classDefinition: ClassDefinition,
-    ): DynamicType.Builder<T> {
+    ): DynamicType.Builder<out T> {
         var current = builder
 
         classDefinition.getProperties().forEach { field ->
@@ -51,22 +51,22 @@ class FieldsGenerator<T>(
     }
 
     private fun defineBaseField(
-        builder: DynamicType.Builder<T>,
+        builder: DynamicType.Builder<out T>,
         name: String,
         fieldType: TypeDescription,
         modifiers: Int
-    ): DynamicType.Builder<T> {
+    ): DynamicType.Builder<out T> {
         return builder
             .defineField(internalFieldOf(name), fieldType, Modifier.PUBLIC)
             .annotateField(ModifierMetadata(modifiers))
     }
 
     private fun defineNonArraySetter(
-        builder: DynamicType.Builder<T>,
+        builder: DynamicType.Builder<out T>,
         name: String,
         fieldType: TypeDescription,
         isFactor: Boolean,
-    ): DynamicType.Builder<T> {
+    ): DynamicType.Builder<out T> {
         val setterName = internalSetterOf(name)
 
         val appender = ValueSetterAppender(
@@ -83,11 +83,11 @@ class FieldsGenerator<T>(
     }
 
     private fun defineArraySetters(
-        builder: DynamicType.Builder<T>,
+        builder: DynamicType.Builder<out T>,
         name: String,
         actualType: TypeDescription,
         isFactor: Boolean
-    ): DynamicType.Builder<T> {
+    ): DynamicType.Builder<out T> {
         val setterName = internalArrayListSetterOf(name)
 
         val appender = ValueSetterAppender(

@@ -38,14 +38,14 @@ class JvmBytecodeGenerator<T>(
      * @return 生成された `DynamicType.Unloaded<T>`
      */
     @Suppress("UNCHECKED_CAST")
-    fun generateClass(classDefinition: ClassDefinition): DynamicType.Unloaded<T> {
+    fun generateClass(classDefinition: ClassDefinition): DynamicType.Unloaded<out T> {
         val fqcn = generateFQCN(classDefinition)
 
-        var builder: DynamicType.Builder<T> = ByteBuddy(ClassFileVersion.JAVA_V8)
+        var builder: DynamicType.Builder<out T> = ByteBuddy(ClassFileVersion.JAVA_V8)
             .with(TypeValidation.DISABLED)
             .subclass(TypeDescription.ForLoadedType.of(superClass))
             .name(fqcn)
-            .modifiers(Modifier.PUBLIC) as DynamicType.Builder<T>
+            .modifiers(Modifier.PUBLIC) as DynamicType.Builder<out T>
 
         builder = fieldsGenerator.defineFields(builder, classDefinition)
         builder = methodsGenerator.defineAllMethods(builder, classDefinition)

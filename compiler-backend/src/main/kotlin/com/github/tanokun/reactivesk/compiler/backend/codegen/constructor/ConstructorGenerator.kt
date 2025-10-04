@@ -22,9 +22,9 @@ class ConstructorGenerator<T>(
     private val mediatorType = TypeDescription.ForLoadedType(Any::class.java)
 
     fun defineConstructor(
-        builder: DynamicType.Builder<T>,
+        builder: DynamicType.Builder<out T>,
         classDefinition: ClassDefinition,
-    ): DynamicType.Builder<T> {
+    ): DynamicType.Builder<out T> {
         val constructorParameters = classDefinition.constructor.parameters
 
         val parameterTypes = arrayOf(
