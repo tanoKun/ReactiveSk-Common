@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 class TypedVariablesTest {
-    private fun createTypedVariables(): TypedVariables {
+    private fun createTypedVariables(): TypedVariables<Any> {
         return TypedVariables()
     }
 

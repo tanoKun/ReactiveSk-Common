@@ -1,8 +1,6 @@
 package com.github.tanokun.reactivesk.compiler.frontend.analyze.variable
 
-import com.github.tanokun.reactivesk.compiler.frontend.analyze.ast.AstNode
 import com.github.tanokun.reactivesk.lang.Identifier
-import kotlin.collections.getOrPut
 
 /**
  * 型付き変数のテーブルと補助クラスを提供します。
@@ -23,10 +21,10 @@ data class Table(
  * @param lastSection 深さごとの最後に見た `AstNode.Section` を保持するマップ
  * @param index 宣言時に割り当てる連番インデックス
  */
-class TypedVariables(
+class TypedVariables<H>(
     private val table: Table = Table(),
     private val sectionIds: MutableMap<Depth, SectionId> = mutableMapOf(),
-    private val lastSection: MutableMap<Depth, AstNode.Section<*>?> = mutableMapOf(),
+    private val lastSection: MutableMap<Depth, H?> = mutableMapOf(),
     var index: Int = 0
 ) {
     /**
@@ -59,7 +57,7 @@ class TypedVariables(
      *
      * @return 最後に見た `AstNode.Section`、存在しない場合は null
      */
-    fun getLastSection(depth: Depth): AstNode.Section<*>? = lastSection[depth]
+    fun getLastSection(depth: Depth): H? = lastSection[depth]
 
     /**
      * 指定した深さの最後に見た `AstNode.Section` を設定します。
@@ -67,7 +65,7 @@ class TypedVariables(
      * @param depth 設定する深さ
      * @param section 設定する `AstNode.Section`、存在しない場合は null
      */
-    fun setLastSection(depth: Depth, section: AstNode.Section<*>?) {
+    fun setLastSection(depth: Depth, section: H?) {
         lastSection[depth] = section
     }
 
