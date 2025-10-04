@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.github.tanokun.reactivesk"
-version = "1.0.1"
+version = "1.0.2"
 
 repositories {
     mavenCentral()
