@@ -5,6 +5,7 @@ import com.github.tanokun.reactivesk.lang.Identifier
 import com.github.tanokun.reactivesk.skriptadapter.common.dynamic.classloader.DynamicClassLoader
 import com.github.tanokun.reactivesk.skriptadapter.common.dynamic.classloader.DynamicClassDefinitionLoader
 import java.io.File
+import java.lang.ref.WeakReference
 
 /**
  * 動的クラスの管理を行うクラスです。
@@ -14,8 +15,8 @@ import java.io.File
  * @param jvmBytecodeGenerator バイトコードを生成するためのジェネレータ
  */
 class DynamicClassManager<T>(private val scriptRootFolder: File, private val jvmBytecodeGenerator: JvmBytecodeGenerator<T>) {
-    private var currentClassLoader: DynamicClassLoader? = null
-    private var loadedClasses: Map<Identifier, Class<T>> = emptyMap()
+    private var currentClassLoader: WeakReference<DynamicClassLoader>? = null
+    private var loadedClasses: Map<Identifier, Class<out T>> = emptyMap()
     val definitionLoader = DynamicClassDefinitionLoader()
 
     /**
@@ -48,7 +49,7 @@ class DynamicClassManager<T>(private val scriptRootFolder: File, private val jvm
         }
 
         val newClassLoader = DynamicClassLoader(this.javaClass.classLoader, unloadedTypes)
-        this.currentClassLoader = newClassLoader
+        this.currentClassLoader = WeakReference(newClassLoader)
 
         return unloadedTypes.associate { unloadedType ->
             val loadedClass = newClassLoader.loadClass(unloadedType.typeDescription.name) as Class<T>
@@ -63,7 +64,7 @@ class DynamicClassManager<T>(private val scriptRootFolder: File, private val jvm
      *
      * @return 見つかった場合は対応する `Class<T>`、見つからない場合は null
      */
-    fun getLoadedClass(typeName: Identifier): Class<T>? {
+    fun getLoadedClass(typeName: Identifier): Class<out T>? {
         return loadedClasses[typeName]
     }
 
