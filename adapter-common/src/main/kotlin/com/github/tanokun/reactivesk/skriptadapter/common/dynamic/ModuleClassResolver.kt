@@ -1,6 +1,7 @@
 package com.github.tanokun.reactivesk.skriptadapter.common.dynamic
 
 import com.github.tanokun.reactivesk.compiler.backend.ClassResolver
+import com.github.tanokun.reactivesk.compiler.backend.asFqcn
 import com.github.tanokun.reactivesk.lang.Identifier
 import net.bytebuddy.description.annotation.AnnotationList
 import net.bytebuddy.description.type.TypeDescription
@@ -33,9 +34,7 @@ class ModuleClassResolver<T>(
         getLoadedClass(typeName)?.let { return TypeDescription.ForLoadedType.of(it) }
         staticClassResolver(typeName)?.let { return TypeDescription.ForLoadedType.of(it) }
 
-        val fqcn = "com.github.tanokun.reactivesk.dynamic.$typeName"
-
-        return SafeLatentTypeDescription(fqcn)
+        return SafeLatentTypeDescription(typeName.asFqcn())
     }
 
     /**

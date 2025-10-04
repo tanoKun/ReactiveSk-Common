@@ -1,5 +1,6 @@
 package com.github.tanokun.reactivesk.compiler.backend.codegen
 
+import com.github.tanokun.reactivesk.compiler.backend.asFqcn
 import com.github.tanokun.reactivesk.compiler.backend.codegen.constructor.ConstructorGenerator
 import com.github.tanokun.reactivesk.compiler.backend.codegen.field.FieldsGenerator
 import com.github.tanokun.reactivesk.compiler.backend.codegen.method.MethodsGenerator
@@ -27,8 +28,6 @@ class JvmBytecodeGenerator<T>(
     private val methodsGenerator: MethodsGenerator<T>,
     private val fieldsGenerator: FieldsGenerator<T>,
 ) {
-    private fun generateFQCN(classDefinition: ClassDefinition): String =
-        "com.github.tanokun.reactivesk.generated.${classDefinition.className}"
 
     /**
      * 指定した `ClassDefinition` から動的にクラスを生成して返します。
@@ -39,7 +38,7 @@ class JvmBytecodeGenerator<T>(
      */
     @Suppress("UNCHECKED_CAST")
     fun generateClass(classDefinition: ClassDefinition): DynamicType.Unloaded<out T> {
-        val fqcn = generateFQCN(classDefinition)
+        val fqcn = classDefinition.className.asFqcn()
 
         var builder: DynamicType.Builder<out T> = ByteBuddy(ClassFileVersion.JAVA_V8)
             .with(TypeValidation.DISABLED)

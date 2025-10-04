@@ -16,3 +16,5 @@ interface ClassResolver {
      */
     fun resolveTypeDescription(typeName: Identifier, isArray: Boolean = false): TypeDescription
 }
+
+fun Identifier.asFqcn() = "com.github.tanokun.reactivesk.dynamic.$this"
