@@ -39,7 +39,7 @@ class DynamicClassManager<T>(private val scriptRootFolder: File, private val jvm
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun performFullLoad(): Map<Identifier, Class<T>> {
+    private fun performFullLoad(): Map<Identifier, Class<out T>> {
         definitionLoader.loadAllClassesFrom(scriptRootFolder)
 
         val allDefinitions = definitionLoader.getAllDefinitions()
@@ -52,7 +52,7 @@ class DynamicClassManager<T>(private val scriptRootFolder: File, private val jvm
         this.currentClassLoader = WeakReference(newClassLoader)
 
         return unloadedTypes.associate { unloadedType ->
-            val loadedClass = newClassLoader.loadClass(unloadedType.typeDescription.name) as Class<T>
+            val loadedClass = newClassLoader.loadClass(unloadedType.typeDescription.name) as Class<out T>
             Identifier(loadedClass.simpleName) to loadedClass
         }
     }
@@ -68,7 +68,7 @@ class DynamicClassManager<T>(private val scriptRootFolder: File, private val jvm
         return loadedClasses[typeName]
     }
 
-    private fun calculateDifferences(oldMap: Map<Identifier, Class<*>>, newMap: Map<Identifier, Class<T>>): List<ChangedDifference> {
+    private fun calculateDifferences(oldMap: Map<Identifier, Class<*>>, newMap: Map<Identifier, Class<out T>>): List<ChangedDifference> {
         val changedDifferences = mutableListOf<ChangedDifference>()
         val allKeys = oldMap.keys union newMap.keys
 
