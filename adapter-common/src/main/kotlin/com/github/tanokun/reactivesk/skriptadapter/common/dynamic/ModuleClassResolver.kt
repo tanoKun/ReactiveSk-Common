@@ -15,7 +15,7 @@ import java.lang.reflect.Modifier
  * @param staticClassResolver 静的なクラス解決を行う関数
  */
 class ModuleClassResolver<T>(
-    private val moduleManager: DynamicClassManager<T>,
+    private val getLoadedClass: (Identifier) -> Class<out T>?,
     private val staticClassResolver: (Identifier) -> Class<*>?
 ): ClassResolver {
     /**
@@ -30,7 +30,7 @@ class ModuleClassResolver<T>(
         if (isArray) return TypeDescription.ForLoadedType.of(ArrayList::class.java)
         if (typeName.identifier == "void") return TypeDescription.ForLoadedType.of(Void.TYPE)
 
-        moduleManager.getLoadedClass(typeName)?.let { return TypeDescription.ForLoadedType.of(it) }
+        getLoadedClass(typeName)?.let { return TypeDescription.ForLoadedType.of(it) }
         staticClassResolver(typeName)?.let { return TypeDescription.ForLoadedType.of(it) }
 
         val fqcn = "com.github.tanokun.reactivesk.dynamic.$typeName"
