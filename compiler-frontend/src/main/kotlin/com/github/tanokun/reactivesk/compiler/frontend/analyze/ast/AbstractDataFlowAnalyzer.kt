@@ -3,21 +3,28 @@ package com.github.tanokun.reactivesk.compiler.frontend.analyze.ast
 import com.github.tanokun.reactivesk.compiler.frontend.analyze.ast.result.Diagnostic
 
 /**
- * データフロー解析の抽象です。
+ * データフロー解析の抽象クラスです。サブクラスは具体的な状態遷移ルールを実装して解析を行います。
+ *
+ * @param T 解析で扱う状態の型
+ * @param H AST ノードが保持するハンドラの型
+ * @param rootAst 解析対象のルートとなる `AstNode.Struct<H>`
  */
 abstract class AbstractDataFlowAnalyzer<T: Any, H: Any>(private val rootAst: AstNode.Struct<H>) {
 
     /**
-     * サブクラスが定義する、解析開始時の初期状態。
+     * サブクラスが定義する、解析開始時の初期状態
+     *
+     * @return なし
      */
     protected abstract val initialState: T
 
     /**
      * 1行の文を解析し、状態を遷移させます。
      *
-     * @param node 解析対象のLineノード
+     * @param node 解析対象の `AstNode.Line<H>`
      * @param currentState この行の直前の状態
-     * @return この行を解析した結果
+     *
+     * @return この行を解析した結果を表す `AnalysisResult<T, H>`
      */
     protected abstract fun analyzeLine(node: AstNode.Line<H>, currentState: T): AnalysisResult<T, H>
 
@@ -25,12 +32,13 @@ abstract class AbstractDataFlowAnalyzer<T: Any, H: Any>(private val rootAst: Ast
      * 複数の分岐パスの状態をマージするルールを定義します。
      *
      * @param statesToMerge 各分岐パスが完了した後の状態のリスト
-     * @return マージ後の新しい単一の状態。
+     *
+     * @return マージ後の単一の状態
      */
     protected abstract fun mergeBranchStates(statesToMerge: List<T>): T
 
     /**
-     * ループ後の状態をマージするルールを定義する。
+     * ループ後の状態をマージするルールを定義します。
      *
      * @param initialState ループに入る前の状態
      * @param loopBodyFinalState ループ本体を1回以上通過した後の状態
@@ -40,9 +48,9 @@ abstract class AbstractDataFlowAnalyzer<T: Any, H: Any>(private val rootAst: Ast
     protected abstract fun mergeLoopStates(initialState: T, loopBodyFinalState: T): T
 
     /**
-     * 解析完了後、最終的な状態を使って追加の検証します。
+     * 解析完了後、最終的な状態を使って追加の検証を行います。
      *
-     * @param rootNode 解析対象だったASTのルートノード
+     * @param rootNode 解析対象だった AST のルートノードを表す `AstNode.Struct<H>`
      * @param finalState 解析完了後の最終的な状態
      *
      * @return 追加の検証で見つかった診断のリスト
@@ -50,9 +58,11 @@ abstract class AbstractDataFlowAnalyzer<T: Any, H: Any>(private val rootAst: Ast
     protected abstract fun verify(rootNode: AstNode.Struct<H>, finalState: T): List<Diagnostic<H>>
 
     /**
-     * ASTノードの解析結果をラップします。
+     * AST ノードの解析結果をラップするデータクラスです。
      *
-     * @param diagnostics 発見された問題点
+     * @param T 解析で扱う状態の型
+     * @param H AST ノードが保持するハンドラの型
+     * @param diagnostics 発見された診断のリスト
      * @param finalState このノード完了後の最終的な状態
      */
     data class AnalysisResult<T, H>(
@@ -62,6 +72,8 @@ abstract class AbstractDataFlowAnalyzer<T: Any, H: Any>(private val rootAst: Ast
 
     /**
      * 解析を実行し、最終的な診断結果を返します。
+     *
+     * @return 解析結果を表す `AnalysisResult<T, H>`
      */
     fun analyze(): AnalysisResult<T, H> {
         val finalResult = analyzeNode(rootAst, initialState)

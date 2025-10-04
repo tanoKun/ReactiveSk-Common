@@ -10,25 +10,40 @@ import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.TerminalNode
 
 /**
- * ANTLRのパースツリーを巡回し、[ClassDefinition] のリストを構築するVisitor。
+ * ANTLR のパースツリーを巡回して `ClassDefinition` のリストを構築する Visitor です。
+ * Python ライクな文法に基づく構文木からクラス定義要素を抽出します。
  *
- * Pythonの文法パターンを参考にしたg4ファイルに合わせて実装されています。
- * 各visitメソッドは具体的なデータモデルの型を返すため、型安全性が高く、不要なキャストを排除しています。
+ * @return 各 `visit...` メソッドは対応する AST 部分を具体的なデータモデルに変換して返します
  */
 class DynamicClassDefinitionVisitor : DynamicClassDefinitionBaseVisitor<Any>() {
 
     /**
-     * パースツリーのルートから巡回を開始し、ファイル内で定義された全てのクラス定義を抽出します。
+     * パースツリーのルートからファイル内で定義された全てのクラス定義を抽出して返します。
      *
-     * @param ctx プログラム全体のパースツリーコンテキスト。
-     * @return 抽出された [ClassDefinition] のリスト。
+     * @param ctx プログラム全体のパースツリーコンテキスト
+     *
+     * @return 抽出された `List<ClassDefinition>`
      */
     fun visit(ctx: ProgramContext): List<ClassDefinition> =
         visitProgram(ctx)
 
+    /**
+     * `ProgramContext` からトップレベルのクラス定義を抽出して返します。
+     *
+     * @param ctx パースツリーの `ProgramContext`
+     *
+     * @return 抽出された `List<ClassDefinition>`
+     */
     override fun visitProgram(ctx: ProgramContext): List<ClassDefinition> =
         ctx.topLevelElement().mapNotNull { it.classDef() }.map { visitClassDef(it) }
 
+    /**
+     * `ClassDefContext` を解析して `ClassDefinition` を構築して返します。
+     *
+     * @param ctx クラス定義のパースツリーコンテキスト
+     *
+     * @return 対応する `ClassDefinition`
+     */
     override fun visitClassDef(ctx: ClassDefContext): ClassDefinition {
         val className = ctx.name.toIdentifier()
 

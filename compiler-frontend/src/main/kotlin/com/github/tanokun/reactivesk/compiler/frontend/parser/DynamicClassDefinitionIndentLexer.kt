@@ -10,8 +10,10 @@ import java.util.*
 import kotlin.collections.isNotEmpty
 
 /**
- * インデントベースのブロック構造を INDENT/DEDENT トークンとして供給するラッパーレクサーです。
- * 入力の改行ごとに次行の空白量を計測し、インデント差分に応じてトークンを注入します。
+ * インデントベースの入力を INDENT/DEDENT トークンへ変換して供給するレクサーのラッパーです。
+ * 改行ごとに次行の空白量を計測し、インデント差分に応じてトークンを注入します。
+ *
+ * @param input レクサーが読み取る元の `CharStream`
  */
 class DynamicClassDefinitionIndentLexer(input: CharStream) : DynamicClassDefinitionLexer(input) {
 

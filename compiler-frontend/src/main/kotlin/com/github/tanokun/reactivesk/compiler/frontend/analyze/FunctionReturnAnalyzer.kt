@@ -7,12 +7,15 @@ import com.github.tanokun.reactivesk.compiler.frontend.analyze.ast.result.Severi
 import com.github.tanokun.reactivesk.lang.Identifier
 
 /**
- * function セクションに対するデータフロー解析を行い、返り値の検証します。
+ * `function` セクションに対するデータフロー解析を行い、返り値の検証を行います。
+ * 返り値が確定していない経路が存在する場合にエラーを生成します。
  *
- * 以下の場合エラーとなります
- * - 確定した返り値がない場合
+ * @param functionBodyAst 解析対象の関数本体を表す `AstNode.Struct<H>`
+ * @param functionName 検証対象の関数名を表す [Identifier]
+ * @param className 関数が属するクラス名を表す [Identifier]
+ * @param hasReturnValue 関数が返り値を持つかどうかを示すフラグ
  *
- * @return [analyze] は検出した診断（エラー/警告）を時系列で返す
+ * @return `analyze` を実行した際に得られる診断のラップを返す
  */
 class FunctionReturnAnalyzer<H: Any>(
     functionBodyAst: AstNode.Struct<H>,
@@ -22,14 +25,17 @@ class FunctionReturnAnalyzer<H: Any>(
 ) : AbstractDataFlowAnalyzer<Boolean, H>(functionBodyAst) {
 
     /**
-     * 解析開始時、パスはまだ終了していない。
+     * 解析開始時、パスはまだ終了していないことを示します。
      */
     override val initialState: Boolean = false
 
     /**
-     * 1行の文を解析する。
-     * @param currentState この行の直前のパスが終了していたか (true=終了済み)。
-     * @return この行を通過した後のパスが終了しているか (true=終了済み)。
+     * 1行の文を解析します。
+     *
+     * @param node 解析対象の `AstNode.Line<H>`
+     * @param currentState この行の直前のパス終了状態
+     *
+     * @return この行を通過した後のパス終了状態を含む `AnalysisResult<Boolean, H>`
      */
     override fun analyzeLine(
         node: AstNode.Line<H>,
@@ -51,22 +57,36 @@ class FunctionReturnAnalyzer<H: Any>(
     }
 
     /**
-     * 複数の分岐パスの状態(Boolean)をマージする。
+     * 複数の分岐パスの状態をマージします。
+     *
+     * @param statesToMerge マージ対象の状態リスト
+     *
+     * @return すべてのパスが終了している場合に true を返す
      */
     override fun mergeBranchStates(statesToMerge: List<Boolean>): Boolean {
         return statesToMerge.all { it }
     }
 
     /**
-     * ループ後の状態をマージする。
-     * ループは0回実行される可能性があるため、ループ後のパスが終了しているとは限らない。
+     * ループ後の状態をマージします。
+     * ループは 0 回実行される可能性があるため、初期状態を返します。
+     *
+     * @param initialState ループに入る前の状態
+     * @param loopBodyFinalState ループ本体を1回以上通過した後の状態
+     *
+     * @return ループ後の最終状態を表す `Boolean`
      */
     override fun mergeLoopStates(initialState: Boolean, loopBodyFinalState: Boolean): Boolean {
         return initialState
     }
 
     /**
-     * 最終的な検証を行う。
+     * 解析完了後の追加検証を行います。
+     *
+     * @param rootNode 解析対象の AST ルートを表す `AstNode.Struct<H>`
+     * @param finalState 解析完了後の最終状態
+     *
+     * @return 発見された `List<Diagnostic<H>>`
      */
     override fun verify(rootNode: AstNode.Struct<H>, finalState: Boolean): List<Diagnostic<H>> {
         if (hasReturnValue && !finalState) {
