@@ -8,12 +8,26 @@ import com.github.tanokun.reactivesk.skriptadapter.common.analyze.ast.parse.Node
 import kotlin.collections.firstOrNull
 import kotlin.collections.sortedByDescending
 
+/**
+ * Skript のノード列から AST を構築するビルダークラスです。
+ * 指定したパーサ群を用いてノード列を解析し `AstNode.Struct` を生成します。
+ *
+ * @param parsers 使用するパーサのリスト（`NodeParser<T>` のリスト）
+ * @param skriptNodeAdapter ノード列の読み取りを行うアダプタ（`SkriptNodeAdapter<S, T>`）
+ */
 class SkriptAstBuilder<S, T>(
     parsers: List<NodeParser<T>>,
     private val skriptNodeAdapter: SkriptNodeAdapter<S, T>,
 ) {
     private val parsers = parsers.sortedByDescending { it.priority }
 
+    /**
+     * 指定したセクションノードから `SkriptAst` を構築して返します。
+     *
+     * @param sectionNode AST を構築する元となるセクションノード
+     *
+     * @return 構築された `SkriptAst<T>`
+     */
     fun buildFromSectionNode(sectionNode: S): SkriptAst<T> {
         val items = skriptNodeAdapter.loadFromSectionNode(sectionNode)
         val first = items.firstOrNull()
@@ -21,6 +35,13 @@ class SkriptAstBuilder<S, T>(
         return SkriptAst(first, buildFromT(first))
     }
 
+    /**
+     * 指定した最初のノードから `AstNode.Struct` を構築して返します。
+     *
+     * @param first 構築を開始する最初のノード
+     *
+     * @return 構築された `AstNode.Struct<T>`
+     */
     fun buildFromT(first: T?): AstNode.Struct<T> {
         return AstNode.Struct(first, parseBlock(first, stopExclusive = null).elements)
     }
