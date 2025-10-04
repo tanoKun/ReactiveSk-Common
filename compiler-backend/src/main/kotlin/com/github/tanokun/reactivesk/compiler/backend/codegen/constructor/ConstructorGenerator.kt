@@ -13,7 +13,7 @@ import net.bytebuddy.implementation.MethodCall
 import net.bytebuddy.matcher.ElementMatchers
 import java.lang.reflect.Modifier
 
-class ConstructorGenerator(
+class ConstructorGenerator<T>(
     private val classResolver: ClassResolver,
     private val variableFramesIntrinsics: Class<out VariableFramesIntrinsics>,
     private val triggerItemIntrinsics: Class<out TriggerItemIntrinsics>,
@@ -22,9 +22,9 @@ class ConstructorGenerator(
     private val mediatorType = TypeDescription.ForLoadedType(Any::class.java)
 
     fun defineConstructor(
-        builder: DynamicType.Builder<*>,
+        builder: DynamicType.Builder<T>,
         classDefinition: ClassDefinition,
-    ): DynamicType.Builder<*> {
+    ): DynamicType.Builder<T> {
         val constructorParameters = classDefinition.constructor.parameters
 
         val parameterTypes = arrayOf(

@@ -14,7 +14,16 @@ import net.bytebuddy.implementation.Implementation
 import net.bytebuddy.implementation.MethodCall
 import java.lang.reflect.Modifier
 
-class MethodsGenerator(
+/**
+ * `ClassDefinition` に定義された関数を JVM バイトコードとして定義します。
+ *
+ * @param T 生成対象のクラスの型パラメータ
+ * @param classResolver 型解決を行う `ClassResolver`
+ * @param variableFramesIntrinsics 変数フレーム操作を提供するイントリンシックのクラス
+ * @param triggerItemIntrinsics トリガー実行を提供するイントリンシックのクラス
+ * @param isImplementingBeginFrame `beginFrame` を実装するかどうかのフラグ
+ */
+class MethodsGenerator<T>(
     private val classResolver: ClassResolver,
     private val variableFramesIntrinsics: Class<out VariableFramesIntrinsics>,
     private val triggerItemIntrinsics: Class<out TriggerItemIntrinsics>,
@@ -24,10 +33,18 @@ class MethodsGenerator(
 
     private val triggerType = TypeDescription.ForLoadedType(Any::class.java)
 
+    /**
+     * 指定したビルダーに対してクラス定義内のすべての関数を定義します。
+     *
+     * @param builder メソッドを追加する `DynamicType.Builder<T>`
+     * @param classDefinition メソッド定義の元となる `ClassDefinition`
+     *
+     * @return メソッドが追加された `DynamicType.Builder<T>`
+     */
     fun defineAllMethods(
-        builder: DynamicType.Builder<*>,
+        builder: DynamicType.Builder<T>,
         classDefinition: ClassDefinition,
-    ): DynamicType.Builder<*> {
+    ): DynamicType.Builder<T> {
         var current = builder
 
         classDefinition.functions.forEach { func ->

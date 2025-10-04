@@ -11,23 +11,41 @@ import net.bytebuddy.dynamic.DynamicType
 import net.bytebuddy.dynamic.scaffold.TypeValidation
 import java.lang.reflect.Modifier
 
-class JvmBytecodeGenerator(
-    val superClass: Class<*>,
-    private val constructorGenerator: ConstructorGenerator,
-    private val methodsGenerator: MethodsGenerator,
-    private val fieldsGenerator: FieldsGenerator,
+/**
+ * `ClassDefinition` から JVM バイトコードを生成するジェネレータです。
+ * 指定したスーパークラスを継承した動的クラスを生成します。
+ *
+ * @param T 生成対象のクラスの型パラメータ
+ * @param superClass 生成されるクラスのスーパークラス
+ * @param constructorGenerator コンストラクタ生成を担当する `ConstructorGenerator<T>`
+ * @param methodsGenerator メソッド生成を担当する `MethodsGenerator<T>`
+ * @param fieldsGenerator フィールド生成を担当する `FieldsGenerator<T>`
+ */
+class JvmBytecodeGenerator<T>(
+    val superClass: Class<T>,
+    private val constructorGenerator: ConstructorGenerator<T>,
+    private val methodsGenerator: MethodsGenerator<T>,
+    private val fieldsGenerator: FieldsGenerator<T>,
 ) {
     private fun generateFQCN(classDefinition: ClassDefinition): String =
         "com.github.tanokun.reactivesk.generated.${classDefinition.className}"
 
-    fun generateClass(classDefinition: ClassDefinition): DynamicType.Unloaded<*> {
+    /**
+     * 指定した `ClassDefinition` から動的にクラスを生成して返します。
+     *
+     * @param classDefinition 生成元の `ClassDefinition`
+     *
+     * @return 生成された `DynamicType.Unloaded<T>`
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun generateClass(classDefinition: ClassDefinition): DynamicType.Unloaded<T> {
         val fqcn = generateFQCN(classDefinition)
 
-        var builder: DynamicType.Builder<*> = ByteBuddy(ClassFileVersion.JAVA_V8)
+        var builder: DynamicType.Builder<T> = ByteBuddy(ClassFileVersion.JAVA_V8)
             .with(TypeValidation.DISABLED)
             .subclass(TypeDescription.ForLoadedType.of(superClass))
             .name(fqcn)
-            .modifiers(Modifier.PUBLIC)
+            .modifiers(Modifier.PUBLIC) as DynamicType.Builder<T>
 
         builder = fieldsGenerator.defineFields(builder, classDefinition)
         builder = methodsGenerator.defineAllMethods(builder, classDefinition)

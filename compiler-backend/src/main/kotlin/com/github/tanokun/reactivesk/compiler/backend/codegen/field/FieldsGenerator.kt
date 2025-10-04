@@ -16,14 +16,22 @@ import net.bytebuddy.implementation.Implementation
 import net.bytebuddy.implementation.MethodCall
 import java.lang.reflect.Modifier
 
-class FieldsGenerator(
+/**
+ * クラス定義からフィールドおよび対応するセッタを生成するジェネレータです。
+ * プロパティの型解決と単一要素／配列用のセッタを定義します。
+ *
+ * @param T 生成対象のクラスの型パラメータ
+ * @param classResolver 型解決を行う `ClassResolver`
+ * @param jvmSetterIntrinsics 変更通知や型チェックを行うイントリンシックのクラス
+ */
+class FieldsGenerator<T>(
     private val classResolver: ClassResolver,
     private val jvmSetterIntrinsics: Class<out JvmSetterIntrinsics>,
 ) {
     fun defineFields(
-        builder: DynamicType.Builder<*>,
+        builder: DynamicType.Builder<T>,
         classDefinition: ClassDefinition,
-    ): DynamicType.Builder<*> {
+    ): DynamicType.Builder<T> {
         var current = builder
 
         classDefinition.getProperties().forEach { field ->
@@ -43,22 +51,22 @@ class FieldsGenerator(
     }
 
     private fun defineBaseField(
-        builder: DynamicType.Builder<*>,
+        builder: DynamicType.Builder<T>,
         name: String,
         fieldType: TypeDescription,
         modifiers: Int
-    ): DynamicType.Builder<*> {
+    ): DynamicType.Builder<T> {
         return builder
             .defineField(internalFieldOf(name), fieldType, Modifier.PUBLIC)
             .annotateField(ModifierMetadata(modifiers))
     }
 
     private fun defineNonArraySetter(
-        builder: DynamicType.Builder<*>,
+        builder: DynamicType.Builder<T>,
         name: String,
         fieldType: TypeDescription,
         isFactor: Boolean,
-    ): DynamicType.Builder<*> {
+    ): DynamicType.Builder<T> {
         val setterName = internalSetterOf(name)
 
         val appender = ValueSetterAppender(
@@ -75,11 +83,11 @@ class FieldsGenerator(
     }
 
     private fun defineArraySetters(
-        builder: DynamicType.Builder<*>,
+        builder: DynamicType.Builder<T>,
         name: String,
         actualType: TypeDescription,
         isFactor: Boolean
-    ): DynamicType.Builder<*> {
+    ): DynamicType.Builder<T> {
         val setterName = internalArrayListSetterOf(name)
 
         val appender = ValueSetterAppender(
