@@ -21,10 +21,10 @@ data class Table(
  * @param lastSection 深さごとの最後に見た `AstNode.Section` を保持するマップ
  * @param index 宣言時に割り当てる連番インデックス
  */
-class TypedVariables<H>(
+class TypedVariables<S>(
     private val table: Table = Table(),
     private val sectionIds: MutableMap<Depth, SectionId> = mutableMapOf(),
-    private val lastSection: MutableMap<Depth, H?> = mutableMapOf(),
+    private val lastSection: MutableMap<Depth, S?> = mutableMapOf(),
     var index: Int = 0
 ) {
     /**
@@ -51,21 +51,21 @@ class TypedVariables<H>(
     }
 
     /**
-     * 指定した深さの最後に見た `AstNode.Section` を返します。
+     * 指定した深さの最後に見た `Section` を返します。
      *
      * @param depth 取得する深さ
      *
-     * @return 最後に見た `AstNode.Section`、存在しない場合は null
+     * @return 最後に見た `Section`、存在しない場合は null
      */
-    fun getLastSection(depth: Depth): H? = lastSection[depth]
+    fun getLastSection(depth: Depth): S? = lastSection[depth]
 
     /**
-     * 指定した深さの最後に見た `AstNode.Section` を設定します。
+     * 指定した深さの最後に見た `Section` を設定します。
      *
      * @param depth 設定する深さ
-     * @param section 設定する `AstNode.Section`、存在しない場合は null
+     * @param section 設定する `Section`、存在しない場合は null
      */
-    fun setLastSection(depth: Depth, section: H?) {
+    fun setLastSection(depth: Depth, section: S?) {
         lastSection[depth] = section
     }
 

@@ -8,16 +8,17 @@ typealias SectionId = Int
 
 /**
  * AST 単位で型付き変数の解決と管理を行うユーティリティオブジェクトです。
- * 弱参照マップにより AST ごとに `TypedVariables<H>` を保持し、宣言の登録や解決、セクションの更新を行います。
+ * 弱参照マップにより AST ごとに `TypedVariables<S>` を保持し、宣言の登録や解決、セクションの更新を行います。
  *
  * @param H AST の比較のハンドルとなる型
+ * @param S セクションのハンドルとなる型
  * @param Depth 深さを表す型エイリアス
  * @param SectionId セクション識別子を表す型エイリアス
  */
-class TypedVariableResolver<H> {
-    private val variablesByTop = WeakHashMap<H, TypedVariables<H>>()
+class TypedVariableResolver<H, S> {
+    private val variablesByTop = WeakHashMap<H, TypedVariables<S>>()
 
-    private fun getOrCreateVariables(top: H): TypedVariables<H> {
+    private fun getOrCreateVariables(top: H): TypedVariables<S> {
         return variablesByTop.getOrPut(top) {
             TypedVariables()
         }
@@ -30,11 +31,11 @@ class TypedVariableResolver<H> {
      *
      * @param top 対象の AST ルートを表す `H`
      * @param depth 現在の深さを表す `Depth`
-     * @param currentSection 現在のセクションを表す `AstNode.Section`、存在しない場合は null
+     * @param currentSection 現在のセクションを表す `Section`、存在しない場合は null
      *
      * @return 現在の深さに対応する `SectionId`
      */
-    fun touchSection(top: H, depth: Depth, currentSection: H?): Int {
+    fun touchSection(top: H, depth: Depth, currentSection: S?): Int {
         val vars = getOrCreateVariables(top)
         val previousSection = vars.getLastSection(depth)
 

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 class TypedVariableResolverTest {
-    private fun createResolver(): TypedVariableResolver<Any> = TypedVariableResolver()
+    private fun createResolver(): TypedVariableResolver<Any, Any> = TypedVariableResolver()
 
     @Test
     @DisplayName("touchSection: 初回は0を返しテーブルを作成すること")
