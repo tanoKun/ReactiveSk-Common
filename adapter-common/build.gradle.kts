@@ -7,7 +7,7 @@ plugins {
     `java-library`
 }
 
-group = "com.github.tanoKun"
+group = "com.github.tanokun"
 version = "1.0.5"
 
 
@@ -54,6 +54,7 @@ publishing {
         create<MavenPublication>("maven") {
             from(components["java"])
             artifactId = "adapter-common"
+            version = project.version.toString()
         }
     }
 }

@@ -9,8 +9,9 @@ plugins {
     antlr
 }
 
-group = "com.github.tanoKun"
+group = "com.github.tanokun"
 version = "1.0.2"
+
 
 repositories {
     mavenCentral()
@@ -65,6 +66,7 @@ publishing {
         create<MavenPublication>("maven") {
             from(components["java"])
             artifactId = "compiler-frontend"
+            version = project.version.toString()
         }
     }
 }

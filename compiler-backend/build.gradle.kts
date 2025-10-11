@@ -7,7 +7,7 @@ plugins {
     `java-library`
 }
 
-group = "com.github.tanoKun"
+group = "com.github.tanokun"
 version = "1.0.5"
 
 repositories {
@@ -50,6 +50,7 @@ publishing {
         create<MavenPublication>("maven") {
             from(components["java"])
             artifactId = "compiler-backend"
+            version = project.version.toString()
         }
     }
 }

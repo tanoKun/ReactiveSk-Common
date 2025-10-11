@@ -7,7 +7,7 @@ plugins {
     `java-library`
 }
 
-group = "com.github.tanoKun"
+group = "com.github.tanokun"
 version = "1.0.0"
 
 repositories {
