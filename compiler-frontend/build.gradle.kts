@@ -9,7 +9,7 @@ plugins {
     antlr
 }
 
-group = "com.github.tanokun.reactivesk"
+group = "com.github.tanoKun"
 version = "1.0.2"
 
 repositories {
@@ -77,16 +77,7 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
-        }
-    }
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/tanoKun/ReactiveSk-Common")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN") // or use PAT in secrets
-            }
+            artifactId = "compiler-frontend"
         }
     }
 }

@@ -7,7 +7,7 @@ plugins {
     `java-library`
 }
 
-group = "com.github.tanokun.reactivesk"
+group = "com.github.tanoKun"
 version = "1.0.0"
 
 repositories {
@@ -40,6 +40,7 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
+            artifactId = "lang"
         }
     }
     repositories {
