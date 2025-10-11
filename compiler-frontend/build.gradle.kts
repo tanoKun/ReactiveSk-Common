@@ -25,16 +25,11 @@ dependencies {
 }
 
 tasks.generateGrammarSource {
-    maxHeapSize = "64m"
-    arguments = arguments + listOf("-visitor", "-long-messages")
+    isEnabled = false
 }
 
-tasks.compileKotlin {
-    dependsOn(tasks.generateGrammarSource)
-}
-
-tasks.compileTestKotlin {
-    dependsOn(tasks.generateTestGrammarSource)
+tasks.generateTestGrammarSource {
+    isEnabled = false
 }
 
 kotlin {
@@ -63,14 +58,6 @@ tasks.named<Jar>("sourcesJar") {
     archiveClassifier.set("sources")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(sourceSets["main"].allSource)
-
-    val genDir = layout.buildDirectory.dir("generated-src/antlr/main")
-    dependsOn(tasks.named("generateGrammarSource"))
-    from(genDir) {
-        include("**/*")
-    }
-
-    inputs.dir(genDir)
 }
 
 publishing {
