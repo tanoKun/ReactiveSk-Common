@@ -16,7 +16,7 @@ typealias SectionId = Int
  * @param SectionId セクション識別子を表す型エイリアス
  */
 class TypedVariableResolver<H, S> {
-    private val variablesByTop = WeakHashMap<H, TypedVariables<S>>()
+    private val variablesByTop = IdentityHashMap<H, TypedVariables<S>>()
 
     private fun getOrCreateVariables(top: H): TypedVariables<S> {
         return variablesByTop.getOrPut(top) {
